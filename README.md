@@ -8,15 +8,13 @@ This project analyzes customer purchasing behavior using RFM analysis to identif
 - Python
 - Power BI
 
-## Objectives
-- Segment customers based on purchasing behavior
-- Identify high-value customers
-- Support upsell and cross-sell strategies
+## Business Question
+Which customer groups bring the most value to the business, and how can marketing campaingns be tailored to each group to increase purchase frequency and retention?
 
-## Key Insights
-- Millennials and Gen X are the most valuable customer groups
-- Female customers contribute significantly to sales
-- Beverage products are the most purchased items
+##  Data
+- **Source:** https://www.kaggle.com/datasets/mmohaiminulislam/ecommerce-data-analysis
+- **Size**: 6 tables, 9191 customers, ~ 1 million transactions
+- **Period:** 2018-2021
 
 ## Dashboard Preview
 
