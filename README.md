@@ -5,7 +5,6 @@ This project analyzes customer purchasing behavior using RFM analysis to identif
 
 ## Tools Used
 - SQL
-- Python
 - Power BI
 
 ## Business Question
