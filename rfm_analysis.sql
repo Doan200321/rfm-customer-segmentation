@@ -11,7 +11,7 @@ SELECT coustomer_key,
     DATEDIFF(DAY,max([date]),getdate()) as R,
     cast(1.*count([item_key])/DATEDIFF(MONTH,min([date]),getdate()) as decimal(5,3)) as F,
     sum([total_price]) as M
-from [dbo].[fact_table] as F join [dbo].[time_dim_update] as T_D on F.time_key=T_D.time_key
+from [dbo].[fact_table] as F join [dbo].[time_dim] as T_D on F.time_key=T_D.time_key
 group by coustomer_key
 ),
 RFM_Score as(
