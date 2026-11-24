@@ -1,6 +1,6 @@
 /* ============================================================
    RFM Customer Segmentation (v2)
-   Data: (link Kaggle)
+   Data: https://www.kaggle.com/datasets/mmohaiminulislam/ecommerce-data-analysis
    Output: view vw_rfm_customer – 1 row per customer
    ============================================================ */
 use Final_Project
