@@ -1,6 +1,6 @@
 /* ============================================================
    RFM Customer Segmentation (v2)
-   Data: https://www.kaggle.com/datasets/mmohaiminulislam/ecommerce-data-analysis
+   Data: (link Kaggle)
    Output: view vw_rfm_customer – 1 row per customer
    ============================================================ */
 use Final_Project
@@ -23,7 +23,7 @@ go
 -- =====================================================
 -- 2. RFM VIEW
 -- =====================================================
-create view vw_rfm_customer as
+alter view vw_rfm_customer as
     with RFM as(
     -- R = number of days since the last purchase to the reference date
     -- F = number of purchases; M = total spending
@@ -44,23 +44,26 @@ create view vw_rfm_customer as
             NTILE(5) over(order by M, [coustomer_key]) as M_score
         from RFM
     ),
-    Type_Cus as(
-    -- Group customers by their R/F/M scores (1-5).
-    -- Only recent customers (R_score >= 4) are assigned to the 4 main segments; the rest are 'Other'.
-    select*,
-        case
-            when R_score>=4 and F_score>=4 and M_score>=4 then 'Best Customer'
-            when R_score>=4 and (F_Score>=2 and F_score<=3) 
-                and (M_score>=2 and M_score<=3) then 'Loyal Customer'
-            when R_score>=4 and (F_score>=4) 
-                and (M_score>=2 and M_score<=3) then 'Potential Loyal Customer'
-            when R_score>=4 and (F_score<=2) 
-                and M_score>=4 then 'Prospective VIP Customer'
-            else 'Other'
-        end as Type_Customers
+    FM as (
+    -- FM_score is the average of F_score (number of purchases) and M_score (total spending).
+    -- We use the average because it is on the same 1-5 scale as R_score,
+    -- which makes it easy for readers to compare and understand.
+    select *,((F_score+M_score)*1.0)/2 as FM_score
     from RFM_Score
+    ),
+    Type_Cus as(
+    -- Segment customers on two dimensions: R and FM.
+    -- A score (R_score or FM_score) >= 3 is considered "high".
+    select *,
+        case
+            when R_score>=3 and FM_score>=3 then 'Champions'
+            when R_score<3 and FM_score>=3 then 'At Risk'
+            when R_score>=3 and FM_score<3 then 'New'
+            when R_score<3 and FM_score<3 then 'Lost'
+        end as Type_Customers
+    from FM
     )
-    SELECT coustomer_key,Type_Customers,R,F,M, R_score,F_score,M_score
+    SELECT coustomer_key,Type_Customers,R,F,M, R_score,FM_score
     from Type_Cus
 
 go
@@ -69,4 +72,12 @@ go
 -- 3. OUTPUT CHECKS
 -- =====================================================
 SELECT TOP 10 * FROM vw_rfm_customer;
-SELECT Type_Customers, COUNT(*) FROM vw_rfm_customer GROUP BY Type_Customers;
+SELECT Type_Customers, COUNT(*) as num_cus FROM vw_rfm_customer GROUP BY Type_Customers;
+go
+
+select Type_Customers, 
+    count(*) as num_customers, count(*)*1.0/sum(count(*)) over() as pct_customers, 
+    sum(M) as revenue, sum(M)*1.0/sum(sum(M)) over() as pct_revenue
+from vw_rfm_customer
+group by [Type_Customers]
+order by revenue desc 
